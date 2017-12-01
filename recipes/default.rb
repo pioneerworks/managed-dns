@@ -1,4 +1,3 @@
-dns_provider = node['managed_dns']['provider']
-dns_provider_recipe = "managed-dns::#{dns_provider}"
 
-include_recipe dns_provider_recipe
+include_recipe 'managed-dns::dns_record'
+include_recipe 'managed-dns::local_hostname'

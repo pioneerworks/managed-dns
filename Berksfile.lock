@@ -1,0 +1,7 @@
+DEPENDENCIES
+  managed-dns
+    path: .
+    metadata: true
+
+GRAPH
+  managed-dns (1.0.1)

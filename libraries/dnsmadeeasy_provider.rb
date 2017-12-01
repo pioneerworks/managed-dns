@@ -1,4 +1,4 @@
-class Chef
+^class Chef
   class Provider
     class ManagedDnsRecord
       class DnsMadeEasy < Chef::Provider
@@ -16,8 +16,8 @@ class Chef
 
         def action_create
           unless exists?
-            Chef::Log.info('dnsmadeeasy: Creating A Name Record')
-            api.create_a_record(new_resource.domain, new_resource.a_record, new_resource.ipaddress, { 'ttl' => new_resource.ttl })
+            Chef::Log.info('Creating A Name Record')
+            api.create_record(new_resource.domain, new_resource.name, new_resource.type, new_resource.value, { 'ttl' => new_resource.ttl })
             new_resource.updated_by_last_action(true)
           end
         end
@@ -25,7 +25,7 @@ class Chef
         def action_update
           if exists?
             return unless changed?
-            Chef::Log.info('dnsmadeeasy: Changing A Name Record')
+            Chef::Log.info('Changing A Name Record')
             api.update_record(new_resource.domain, existing_record['id'], new_resource.a_record, new_resource.record_type, new_resource.ipaddress, { 'ttl' => new_resource.ttl })
             new_resource.updated_by_last_action(true)
           else
@@ -36,18 +36,20 @@ class Chef
         private
 
         def exists?
-          !!current_resource
+          !current_resource.nil?
         end
 
         def changed?
           return false unless current_resource
-          [:domain, :ipaddress, :record_type, :name, :a_record, :ttl].any? do |field|
+          %i[domain value name tty ttl].any? do |field|
             new_resource.send(field) != current_resource.send(field)
           end
         end
 
         def existing_record
-          @existing_record ||= domain_records.detect { |r| r['name'] == new_resource.a_record && r['type'] == new_resource.record_type }
+          @existing_record ||= domain_records.detect do |r|
+            r['name'] == new_resource.a_record && r['type'] == new_resource.record_type
+          end
         end
 
         def domain_records
